@@ -1,40 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>My AI Avatar</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     html, body {
       margin: 0; padding: 0;
       width: 100%; height: 100%;
       overflow: hidden;
-      background-color: #f9f9f9;
+      background: #f9f9f9;
+      font-family: system-ui, sans-serif;
     }
     .avatar-wrapper {
       width: 100%;
       max-width: 420px;
       margin: auto;
       text-align: center;
+      padding-top: 40px;
     }
     iframe {
       width: 100%;
       height: 600px;
       border: none;
       border-radius: 16px;
-      box-shadow: 0 0 16px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 0 16px rgba(0,0,0,0.25);
+    }
+    #loading {
+      color: #555;
+      font-size: 1rem;
+      padding: 2rem;
     }
   </style>
 </head>
 <body>
-  <!-- === Fortified Heygen Floating Avatar === -->
   <div class="avatar-wrapper">
-    <iframe
-      src="https://labs.heygen.com/guest/streaming-embed?share=eyJxdWFsaXR5IjoiaGlnaCIsImF2YXRhck5hbWUiOiJlMzA1NDViNDgwNGM0YzhmYTM4NDg3YjViZTJkNmQ1YyIsInByZXZpZXdJbWciOiJodHRwczovL2ZpbGVzMi5oZXlnZW4uYWkvYXZhdGFyL3YzL2UzMDU0NWI0ODA0YzRjOGZhMzg0ODdiNWJlMmQ2ZDVjL2Z1bGwvMi4yL3ByZXZpZXdfdGFyZ2V0LndlYnAiLCJuZWVkUmVtb3ZlQmFja2dyb3VuZCI6ZmFsc2UsImtub3dsZWRnZUJhc2VJZCI6IjNhYTNjZjlhNzg1ZDQ1YmM5ZjcyYTZhNDI0ZmI2MDFmIiwidXNlcm5hbWUiOiJlNTFlZmYzZjJhYzA0ZGZjYjQ3MGQzNmM2OWRiMWNlNiJ9&inIFrame=1"
-      allow="microphone; camera; autoplay; clipboard-write"
-      sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-      allowfullscreen>
-    </iframe>
+    <div id="loading">🛰️ Initializing AI Avatar …</div>
+    <div id="avatar-frame"></div>
   </div>
+
+  <script>
+    // === CONFIG ===
+    // Replace these two values after you deploy the backend to Render
+    const BACKEND_BASE = "https://your-render-backend.onrender.com";
+    const ADMIN_KEY    = "your_admin_key_here";
+
+    async function loadAvatar() {
+      try {
+        const res = await fetch(`${BACKEND_BASE}/heygen/token`, {
+          method: "POST",
+          headers: { "X-Admin-Key": ADMIN_KEY },
+        });
+        if (!res.ok) throw new Error(`Token request failed: ${res.status}`);
+        const data = await res.json();
+        const url = data?.data?.share_url || data?.share_url;
+        if (!url) throw new Error("No share_url returned from backend");
+
+        const iframe = document.createElement("iframe");
+        iframe.src = `${url}&inIFrame=1`;
+        iframe.allow =
+          "microphone; camera; autoplay; clipboard-write";
+        iframe.sandbox =
+          "allow-same-origin allow-scripts allow-popups allow-forms";
+        iframe.allowFullscreen = true;
+
+        document.getElementById("avatar-frame").appendChild(iframe);
+        document.getElementById("loading").remove();
+      } catch (err) {
+        console.error("Avatar load error:", err);
+        document.getElementById("loading").textContent =
+          "⚠️ Avatar failed to load – check backend token service.";
+      }
+    }
+
+    loadAvatar();
+  </script>
 </body>
 </html>
