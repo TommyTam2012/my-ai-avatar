@@ -1,81 +1,101 @@
-<!-- TommySir Avatar + Centered Heygen Iframe (with Close Button + Safe Position) -->
-<script>
-  window.addEventListener('DOMContentLoaded', () => {
-    const existingAvatar = document.getElementById('floating-avatar');
-    if (existingAvatar) return;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My AI Avatar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <!-- HEYGEN AVATAR SCRIPT BELOW -->
+  <script>
+    !function(window){
+      const host = "https://labs.heygen.com";
+      const url = host + "/guest/streaming-embed?share=eyJxdWFsaXR5IjoiaGlnaCIsImF2YXRhck5hbWUiOiJlMzA1NDViNDgwNGM0YzhmYTM4NDg3YjViZTJkNmQ1YyIsInByZXZpZXdJbWciOiJodHRwczovL2ZpbGVzMi5oZXlnZW4uYWkvYXZhdGFyL3YzL2UzMDU0NWI0ODA0YzRjOGZhMzg0ODdiNWJlMmQ2ZDVjL2Z1bGwvMi4yL3ByZXZpZXdfdGFyZ2V0LndlYnAiLCJuZWVkUmVtb3ZlQmFja2dyb3VuZCI6ZmFsc2UsImtub3dsZWRnZUJhc2VJZCI6IjNhYTNjZjlhNzg1ZDQ1YmM5ZjcyYTZhNDI0ZmI2MDFmIiwidXNlcm5hbWUiOiJlNTFlZmYzZjJhYzA0ZGZjYjQ3MGQzNmM2OWRiMWNlNiJ9&inIFrame=1";
 
-    /* === Floating Avatar Trigger (bottom-right, offset to avoid chatbot) === */
-    const avatarIcon = document.createElement('div');
-    avatarIcon.id = 'floating-avatar';
-    avatarIcon.style.position = 'fixed';
-    avatarIcon.style.bottom = '120px';   /* lift above chatbot */
-    avatarIcon.style.right  = '160px';   /* move left to avoid overlap */
-    avatarIcon.style.zIndex = '2147483647';
-    avatarIcon.style.pointerEvents = 'auto';
-    avatarIcon.innerHTML = `
-      <img
-        src="https://www.taeasla.com/image/TommySirAvatar.png"
-        alt="與 Tommy Sir AI Avatar 聊天"
-        style="width:140px;border-radius:12px;border:2px solid white;
-               box-shadow:0 0 12px rgba(0,153,255,0.5);
-               transition:transform .3s ease;cursor:pointer;"
-        onmouseover="this.style.transform='scale(1.05)'"
-        onmouseout="this.style.transform='scale(1)'"
-        onclick="toggleHeygenIframe(true)"
-      />
-    `;
-    document.body.appendChild(avatarIcon);
+      const clientWidth = document.body.clientWidth;
+      const wrapDiv = document.createElement("div");
+      wrapDiv.id = "heygen-streaming-embed";
 
-    /* === Centered Heygen Chat Window === */
-    const avatarBox = document.createElement('div');
-    avatarBox.id = 'heygen-iframe';
-    avatarBox.style.display = 'none';
-    avatarBox.style.position = 'fixed';
-    avatarBox.style.top  = '50%';
-    avatarBox.style.left = '50%';
-    avatarBox.style.transform = 'translate(-50%, -50%)';
-    avatarBox.style.width  = '420px';
-    avatarBox.style.height = '640px';
-    avatarBox.style.zIndex = '2147483647';
-    avatarBox.style.borderRadius = '16px';
-    avatarBox.style.overflow = 'hidden';
-    avatarBox.style.boxShadow = '0 0 25px rgba(0,0,0,0.35)';
-    avatarBox.style.background = '#000';
+      const container = document.createElement("div");
+      container.id = "heygen-streaming-container";
 
-    avatarBox.innerHTML = `
-      <div id="avatar-close-btn"
-           style="position:absolute;top:6px;right:10px;
-                  z-index:2147483648;font-size:22px;
-                  color:#fff;cursor:pointer;
-                  text-shadow:0 0 6px rgba(0,0,0,0.7);">
-        ×
-      </div>
-      <iframe
-        src="https://labs.heygen.com/guest/streaming-embed?share=YOUR_SHARE_TOKEN&inIFrame=1"
-        width="100%"
-        height="100%"
-        frameborder="0"
-        allow="microphone; camera; autoplay; clipboard-write"
-        sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-        allowfullscreen
-        style="border:none;border-radius:16px;">
-      </iframe>
-    `;
-    document.body.appendChild(avatarBox);
+      const stylesheet = document.createElement("style");
+      stylesheet.innerHTML = `
+        #heygen-streaming-embed {
+          z-index: 9999;
+          position: fixed;
+          left: 40px;
+          bottom: 40px;
+          width: 200px;
+          height: 200px;
+          border-radius: 50%;
+          border: 2px solid #fff;
+          box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.12);
+          transition: all 0.1s linear;
+          overflow: hidden;
+          opacity: 0;
+          visibility: hidden;
+        }
+        #heygen-streaming-embed.show {
+          opacity: 1;
+          visibility: visible;
+        }
+        #heygen-streaming-embed.expand {
+          ${clientWidth < 540
+            ? "height: 266px; width: 96%; left: 50%; transform: translateX(-50%);"
+            : "height: 366px; width: calc(366px * 16 / 9);"}
+          border: 0;
+          border-radius: 8px;
+        }
+        #heygen-streaming-container {
+          width: 100%;
+          height: 100%;
+        }
+        #heygen-streaming-container iframe {
+          width: 100%;
+          height: 100%;
+          border: 0;
+        }
+      `;
 
-    /* === Toggle open / close === */
-    window.toggleHeygenIframe = function (open) {
-      const box = document.getElementById('heygen-iframe');
-      box.style.display =
-        (open || box.style.display === 'none') ? 'block' : 'none';
-    };
+      const iframe = document.createElement("iframe");
+      iframe.allowFullscreen = false;
+      iframe.title = "Streaming Embed";
+      iframe.role = "dialog";
+      iframe.allow = "microphone";
+      iframe.src = url;
 
-    /* === Close Button === */
-    document.addEventListener('click', (e) => {
-      if (e.target && e.target.id === 'avatar-close-btn') {
-        document.getElementById('heygen-iframe').style.display = 'none';
-      }
-    });
-  });
-</script>
-<p>&nbsp;</p>
+      let visible = false, initial = false;
+      window.addEventListener("message", (e) => {
+        if (e.origin === host && e.data && e.data.type === "streaming-embed") {
+          if (e.data.action === "init") {
+            initial = true;
+            wrapDiv.classList.toggle("show", initial);
+          } else if (e.data.action === "show") {
+            visible = true;
+            wrapDiv.classList.toggle("expand", visible);
+          } else if (e.data.action === "hide") {
+            visible = false;
+            wrapDiv.classList.toggle("expand", visible);
+          }
+        }
+      });
+
+      container.appendChild(iframe);
+      wrapDiv.appendChild(stylesheet);
+      wrapDiv.appendChild(container);
+      document.body.appendChild(wrapDiv);
+    }(globalThis);
+  </script>
+</body>
+</html>
