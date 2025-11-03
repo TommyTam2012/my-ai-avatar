@@ -42,8 +42,8 @@
   <script>
     // === CONFIG ===
     // Replace these two values after you deploy the backend to Render
-    const BACKEND_BASE = "https://your-render-backend.onrender.com";
-    const ADMIN_KEY    = "your_admin_key_here";
+    const BACKEND_BASE = "/api/heygen_token";
+   const ADMIN_KEY = import.meta.env.VITE_BCM_ADMIN_KEY;
 
     async function loadAvatar() {
       try {
