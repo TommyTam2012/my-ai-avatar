@@ -41,25 +41,25 @@
 
   <script>
     // === CONFIG ===
-    // Replace these two values after you deploy the backend to Render
-    const BACKEND_BASE = "/api/heygen_token";
-   const ADMIN_KEY = import.meta.env.VITE_BCM_ADMIN_KEY;
+    const BACKEND_BASE = "/api/heygen_token";  // points to your Vercel Python API
+    const ADMIN_KEY = "kP7!tQ9#zX1$wE8@hJ3%uV6^nB4&yL2";  // must match Vercel ADMIN_KEY
 
     async function loadAvatar() {
       try {
-        const res = await fetch(`${BACKEND_BASE}/heygen/token`, {
+        const res = await fetch(BACKEND_BASE, {
           method: "POST",
           headers: { "X-Admin-Key": ADMIN_KEY },
         });
+
         if (!res.ok) throw new Error(`Token request failed: ${res.status}`);
+
         const data = await res.json();
         const url = data?.data?.share_url || data?.share_url;
         if (!url) throw new Error("No share_url returned from backend");
 
         const iframe = document.createElement("iframe");
         iframe.src = `${url}&inIFrame=1`;
-        iframe.allow =
-          "microphone; camera; autoplay; clipboard-write";
+        iframe.allow = "microphone; camera; autoplay; clipboard-write";
         iframe.sandbox =
           "allow-same-origin allow-scripts allow-popups allow-forms";
         iframe.allowFullscreen = true;
