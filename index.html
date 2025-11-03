@@ -41,7 +41,7 @@
 
   <script>
     // === CONFIG ===
-    const BACKEND_BASE = "/api/heygen_token";  // points to your Vercel Python API
+    const BACKEND_BASE = "/api/heygen_token";  // use same Vercel domain
     const ADMIN_KEY = "kP7!tQ9#zX1$wE8@hJ3%uV6^nB4&yL2";  // must match Vercel ADMIN_KEY
 
     async function loadAvatar() {
@@ -50,7 +50,6 @@
           method: "POST",
           headers: { "X-Admin-Key": ADMIN_KEY },
         });
-
         if (!res.ok) throw new Error(`Token request failed: ${res.status}`);
 
         const data = await res.json();
@@ -59,7 +58,8 @@
 
         const iframe = document.createElement("iframe");
         iframe.src = `${url}&inIFrame=1`;
-        iframe.allow = "microphone; camera; autoplay; clipboard-write";
+        iframe.allow =
+          "microphone; camera; autoplay; clipboard-write";
         iframe.sandbox =
           "allow-same-origin allow-scripts allow-popups allow-forms";
         iframe.allowFullscreen = true;
