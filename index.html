@@ -18,84 +18,69 @@
 <body>
   <!-- HEYGEN AVATAR SCRIPT BELOW -->
   <script>
-    !function(window){
-      const host = "https://labs.heygen.com";
-      const url = host + "/guest/streaming-embed?share=eyJxdWFsaXR5IjoiaGlnaCIsImF2YXRhck5hbWUiOiJlMzA1NDViNDgwNGM0YzhmYTM4NDg3YjViZTJkNmQ1YyIsInByZXZpZXdJbWciOiJodHRwczovL2ZpbGVzMi5oZXlnZW4uYWkvYXZhdGFyL3YzL2UzMDU0NWI0ODA0YzRjOGZhMzg0ODdiNWJlMmQ2ZDVjL2Z1bGwvMi4yL3ByZXZpZXdfdGFyZ2V0LndlYnAiLCJuZWVkUmVtb3ZlQmFja2dyb3VuZCI6ZmFsc2UsImtub3dsZWRnZUJhc2VJZCI6IjNhYTNjZjlhNzg1ZDQ1YmM5ZjcyYTZhNDI0ZmI2MDFmIiwidXNlcm5hbWUiOiJlNTFlZmYzZjJhYzA0ZGZjYjQ3MGQzNmM2OWRiMWNlNiJ9&inIFrame=1";
-
-      const clientWidth = document.body.clientWidth;
-      const wrapDiv = document.createElement("div");
-      wrapDiv.id = "heygen-streaming-embed";
-
-      const container = document.createElement("div");
-      container.id = "heygen-streaming-container";
-
-      const stylesheet = document.createElement("style");
-      stylesheet.innerHTML = `
-        #heygen-streaming-embed {
-          z-index: 9999;
-          position: fixed;
-          left: 40px;
-          bottom: 40px;
-          width: 200px;
-          height: 200px;
-          border-radius: 50%;
-          border: 2px solid #fff;
-          box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.12);
-          transition: all 0.1s linear;
-          overflow: hidden;
-          opacity: 0;
-          visibility: hidden;
-        }
-        #heygen-streaming-embed.show {
-          opacity: 1;
-          visibility: visible;
-        }
-        #heygen-streaming-embed.expand {
-          ${clientWidth < 540
-            ? "height: 266px; width: 96%; left: 50%; transform: translateX(-50%);"
-            : "height: 366px; width: calc(366px * 16 / 9);"}
-          border: 0;
-          border-radius: 8px;
-        }
-        #heygen-streaming-container {
-          width: 100%;
-          height: 100%;
-        }
-        #heygen-streaming-container iframe {
-          width: 100%;
-          height: 100%;
-          border: 0;
-        }
+    window.addEventListener("DOMContentLoaded", () => {
+      const openBtn = document.createElement("div");
+      openBtn.id = "heygen-open";
+      openBtn.style.position = "fixed";
+      openBtn.style.bottom = "120px";
+      openBtn.style.right = "160px";
+      openBtn.style.zIndex = "2147483647";
+      openBtn.innerHTML = `
+        <img src="https://www.taeasla.com/image/TommySirAvatar.png"
+             alt="Open Avatar"
+             style="width:140px;border-radius:12px;border:2px solid white;
+                    box-shadow:0 0 12px rgba(0,153,255,0.5);cursor:pointer;">
       `;
+      document.body.appendChild(openBtn);
 
-      const iframe = document.createElement("iframe");
-      iframe.allowFullscreen = false;
-      iframe.title = "Streaming Embed";
-      iframe.role = "dialog";
-      iframe.allow = "microphone";
-      iframe.src = url;
+      let frameWrap = null;
 
-      let visible = false, initial = false;
-      window.addEventListener("message", (e) => {
-        if (e.origin === host && e.data && e.data.type === "streaming-embed") {
-          if (e.data.action === "init") {
-            initial = true;
-            wrapDiv.classList.toggle("show", initial);
-          } else if (e.data.action === "show") {
-            visible = true;
-            wrapDiv.classList.toggle("expand", visible);
-          } else if (e.data.action === "hide") {
-            visible = false;
-            wrapDiv.classList.toggle("expand", visible);
-          }
-        }
+      openBtn.addEventListener("click", () => {
+        if (frameWrap) return; // already open
+        frameWrap = document.createElement("div");
+        frameWrap.id = "heygen-framewrap";
+        Object.assign(frameWrap.style, {
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "420px",
+          height: "520px", // reduced white area
+          zIndex: "2147483647",
+          borderRadius: "16px",
+          overflow: "hidden",
+          boxShadow: "0 0 25px rgba(0,0,0,0.35)",
+          background: "#000"
+        });
+        frameWrap.innerHTML = `
+          <div id="heygen-close"
+               style="position:absolute;top:6px;right:10px;
+                      z-index:2147483648;font-size:22px;
+                      color:#fff;cursor:pointer;
+                      text-shadow:0 0 6px rgba(0,0,0,0.7);">
+            ×
+          </div>
+          <iframe
+            id="heygen-iframe"
+            src="https://labs.heygen.com/guest/streaming-embed?share=eyJxdWFsaXR5IjoiaGlnaCIsImF2YXRhck5hbWUiOiJlMzA1NDViNDgwNGM0YzhmYTM4NDg3YjViZTJkNmQ1YyIsInByZXZpZXdJbWciOiJodHRwczovL2ZpbGVzMi5oZXlnZW4uYWkvYXZhdGFyL3YzL2UzMDU0NWI0ODA0YzRjOGZhMzg0ODdiNWJlMmQ2ZDVjL2Z1bGwvMi4yL3ByZXZpZXdfdGFyZ2V0LndlYnAiLCJuZWVkUmVtb3ZlQmFja2dyb3VuZCI6ZmFsc2UsImtub3dsZWRnZUJhc2VJZCI6IjNhYTNjZjlhNzg1ZDQ1YmM5ZjcyYTZhNDI0ZmI2MDFmIiwidXNlcm5hbWUiOiJlNTFlZmYzZjJhYzA0ZGZjYjQ3MGQzNmM2OWRiMWNlNiJ9&inIFrame=1"
+            width="100%" height="100%"
+            allow="microphone; camera; autoplay; clipboard-write"
+            sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+            allowfullscreen
+            style="border:none;border-radius:16px;">
+          </iframe>
+        `;
+        document.body.appendChild(frameWrap);
+
+        // Close and fully stop avatar
+        frameWrap.querySelector("#heygen-close").addEventListener("click", () => {
+          const iframe = document.getElementById("heygen-iframe");
+          if (iframe) iframe.src = "about:blank"; // kill stream
+          frameWrap.remove();
+          frameWrap = null;
+        });
       });
-
-      container.appendChild(iframe);
-      wrapDiv.appendChild(stylesheet);
-      wrapDiv.appendChild(container);
-      document.body.appendChild(wrapDiv);
-    }(globalThis);
+    });
   </script>
 </body>
 </html>
